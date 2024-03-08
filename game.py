@@ -39,6 +39,20 @@ class Game:
 
         # update the display.
         pygame.display.update()
+    
+    def paddle_movement(self, keys):
+        # checks left paddle for key presses. (W and S)
+        if keys[pygame.K_w] and self.left_paddle.y - self.left_paddle.VELOCITY >= 0:
+            self.left_paddle.move(up=True)
+        if keys[pygame.K_s] and self.left_paddle.y + self.left_paddle.VELOCITY + self.left_paddle.height <= self.HEIGHT:
+            self.left_paddle.move(up=False)
+
+        # checks right paddle for key presses. (Up and down arrows)
+        if keys[pygame.K_UP] and self.right_paddle.y - self.right_paddle.VELOCITY >= 0:
+            self.right_paddle.move(up=True)
+        if keys[pygame.K_DOWN] and self.right_paddle.y + self.right_paddle.VELOCITY + self.right_paddle.height <= self.HEIGHT:
+            self.right_paddle.move(up=False)
+
 
     def run_game(self):
         # run the game.
@@ -47,6 +61,13 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
+
+            #wait for user input.
+            keys = pygame.key.get_pressed()
+            self.paddle_movement(keys)
+
+            # update the balls position.
+            self.ball.move()
 
             # draw the game objects.
             self.draw_objects()

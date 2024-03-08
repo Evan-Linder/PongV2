@@ -3,6 +3,8 @@ import pygame
 
 class Paddle:
     WHITE = (255, 255, 255)
+    VELOCITY = 4
+
     # Initalize the paddles.
     def __init__ (self, x, y, width, height):
 
@@ -15,6 +17,16 @@ class Paddle:
     def draw_objects(self, win):
         # set the values of the dimensions in a tuple to avoid errors and make them unmutable.
         pygame.draw.rect(win, self.WHITE, (self.x, self.y, self.width, self.height))
+
+    
+    # move the paddle up or down.
+    def move(self, up = True):
+
+        if up:
+            self.y -= self.VELOCITY
+        
+        else:
+            self.y += self.VELOCITY
 
 
 
