@@ -68,11 +68,33 @@ class Game:
                  if self.ball.x - self.ball.radius <= self.left_paddle.x + self.left_paddle.width:
                     self.ball.x_velocity *= -1
 
+                    # check how far the ball is from the middle of the paddle. Adjust the velocity accordingly.
+                    middle_y = self.left_paddle.y + self.left_paddle.height / 2
+
+                    # find the difference of the middle point and balls y coordinate.
+                    difference_in_y = middle_y - self.ball.y
+
+                    # scale down difference to match velocity of the ball
+                    reduction_factor = (self.left_paddle.height / 2) / self.ball.MAX_VELOCITY
+                    y_velocity = difference_in_y / reduction_factor
+
+                    #reverse velocity
+                    self.ball.y_velocity = -1 * y_velocity
+                    
+
+
         # Check if the ball is moving right. If true, check for collision with the right paddle.
         else:
             if self.ball.y >= self.right_paddle.y and self.ball.y <= self.right_paddle.y + self.right_paddle.height:
                 if self.ball.x + self.ball.radius >= self.right_paddle.x:
                     self.ball.x_velocity *= -1
+
+                    # same logic as the left paddle.
+                    middle_y = self.right_paddle.y + self.left_paddle.height / 2 
+                    difference_in_y = middle_y - self.ball.y
+                    reduction_factor = (self.right_paddle.height / 2) / self.ball.MAX_VELOCITY
+                    y_velocity = difference_in_y / reduction_factor
+                    self.ball.y_velocity = -1 * y_velocity
 
         
         
