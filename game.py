@@ -18,6 +18,10 @@ class Game:
         # put width and height in a tuple to avoid errors and make it unmutable. 
         self.win = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
         pygame.display.set_caption("Pong game")
+        self.font = pygame.font.SysFont(None, 36)
+
+        # fps controller
+        self.clock = pygame.time.Clock()
 
         # Create the left paddle by providing its initial position (10 pixels from the left edge, centered vertically)
         self.left_paddle = Paddle(10, self.HEIGHT * 0.5 - self.PADDLE_HEIGHT * 0.5, self.PADDLE_WIDTH, self.PADDLE_HEIGHT)
@@ -28,6 +32,10 @@ class Game:
         # Create the ball and center it horizontally and vertically.
         self.ball = Ball(self.WIDTH * 0.5, self. HEIGHT * 0.5, self.BALL_RADIUS)
 
+        # set scores to 0
+        self.left_score = 0
+        self.right_score = 0
+
     def draw_objects(self):
         # set background to red.
         self.win.fill(self.RED)
@@ -36,6 +44,12 @@ class Game:
         for paddle in (self.left_paddle , self.right_paddle):
             paddle.draw_objects(self.win)
         
+        # draw and position the scoring text.
+        left_score_text = self.font.render(f'P1: {self.left_score}', 1, self.WHITE)
+        right_score_text = self.font.render(f'P2: {self.right_score}', 1, self.WHITE)
+        self.win.blit(left_score_text, (self.WIDTH // 4 - left_score_text.get_width() * 0.5, 20))
+        self.win.blit(right_score_text, (self.WIDTH * 0.75 - right_score_text.get_width() * 0.5, 20))
+        # draw the ball.       
         self.ball.draw_objects(self.win)
 
         # update the display.
@@ -107,6 +121,7 @@ class Game:
             #update the display. 
             pygame.display.update()
 
-            # set fps to 60 to avoid lagging and screen tearing.
+            # set fps to 60
             pygame.time.Clock().tick(self.FPS)
+            
         
