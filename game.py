@@ -10,7 +10,7 @@ class Game:
     PADDLE_WIDTH, PADDLE_HEIGHT = 10, 100
     BALL_RADIUS = 7
     FPS = 60
-    MAX_SCORE = 5
+    MAX_SCORE = 1
 
     # initalize the game.
     def __init__(self):
@@ -56,6 +56,7 @@ class Game:
         # update the display.
         pygame.display.update()
 
+
     def collision(self):
         # Check if the ball has gone out of bounds. If true, reverse the velocity.
         if self.ball.y + self.ball.radius >= self.HEIGHT:
@@ -99,7 +100,7 @@ class Game:
 
         
         
-    
+
     def paddle_movement(self, keys):
         # checks left paddle for key presses. (W and S)
         if keys[pygame.K_w] and self.left_paddle.y - self.left_paddle.VELOCITY >= 0:
@@ -153,19 +154,20 @@ class Game:
             # update collision
             self.collision()
 
-            # check if ball has gone out of bounds on the left, if so, reset ball and add 1 to right score.
+            # check if ball has gone out of bounds on the left, if so, reset ball and add 1 to right score (left side use 0).
             if self.ball.x < 0:
                 self.right_score += 1
 
                 # check if max score is reached, if so, reset game.
                 if self.right_score >= self.MAX_SCORE:
                     self.display_winner("Player 2 is the winner!")
+                    break
 
                     
 
                 # else reset ball.    
                 else:   
-                    self.ball.reset()
+                    self.ball.reset_ball()
             
             # same logic as before, reversed. (right side use width.)
             elif self.ball.x > self.WIDTH:
@@ -173,10 +175,11 @@ class Game:
 
                 if self.left_score >= self.MAX_SCORE:
                     self.display_winner("Player 1 is the winner!")
+                    break
                     
 
                 else: 
-                    self.ball.reset()
+                    self.ball.reset_ball()
 
             # draw the game objects.
             self.draw_objects()
@@ -188,7 +191,6 @@ class Game:
             pygame.time.Clock().tick(self.FPS)
 
 
-
     def display_winner(self, winner):
         # set winner text according to the argument passed.
         winner_text = self.font.render(f'{winner}', 1, self.WHITE)
@@ -198,9 +200,31 @@ class Game:
         self.win.blit(winner_text, (self.WIDTH * 0.5 - winner_text.get_width() * 0.5, self.HEIGHT * 0.5 - winner_text.get_height() * 0.5))
         pygame.display.update()
 
-        #quit game after 5 seconds.
-        pygame.time.delay(5000)
-        pygame.quit()
+        # display countdown till next game starts (5 seconds)
+        for i in range(5, 0, -1):
+            timer_text = self.font.render(f'Restarting in {i} seconds', 1, self.WHITE)
+            text_width, text_height = timer_text.get_size()
+            text_x = self.WIDTH * 0.5 - text_width * 0.5
+            text_y = self.HEIGHT * 0.75 - text_height * 0.5
+        
+        # Clear the area where the timer text is drawn
+            pygame.draw.rect(self.win, self.RED, (text_x, text_y, text_width, text_height))
+        
+        # Draw the timer text
+            self.win.blit(timer_text, (text_x, text_y))
+            pygame.display.update()
+
+            # create a 1 second pause betweeen each itteration of the loop.
+            pygame.time.delay(1000) 
+
+        # Reset window and run game again.
+        self.left_score = 0
+        self.right_score = 0
+        self.ball.reset_ball()
+        self.left_paddle.reset_paddles()
+        self.right_paddle.reset_paddles()
+        self.run_game()
+
 
         
     

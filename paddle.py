@@ -27,6 +27,12 @@ class Paddle:
         
         else:
             self.y += self.VELOCITY
+    
+        
+    # Reset paddle positions
+    def reset_paddles(self):
+        self.x = self.original_x
+        self.y = self.original_y
 
 
 
