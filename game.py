@@ -10,6 +10,7 @@ class Game:
     PADDLE_WIDTH, PADDLE_HEIGHT = 10, 100
     BALL_RADIUS = 7
     FPS = 60
+    MAX_SCORE = 5
 
     # initalize the game.
     def __init__(self):
@@ -114,7 +115,28 @@ class Game:
 
 
     def run_game(self):
-        # run the game.
+
+        #initalize the starting screen.
+        start_text = self.font.render("Click to start the game!", True, self.WHITE)
+        self.win.fill(self.RED)
+
+        #position text on the window. (tuple to avoid error).
+        self.win.blit(start_text, (self.WIDTH//2 - start_text.get_width() * 0.5, self.HEIGHT * 0.5 - start_text.get_height() * 0.5))
+        pygame.display.update()
+        
+        # Waiting for mouse click to start game.
+        waiting_for_click = True
+        while waiting_for_click:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    waiting_for_click = False
+                    pygame.quit()
+                
+                # if user clicks break loop.
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    waiting_for_click = False
+
+        # run the game after click.
         run = True
         while run:
             for event in pygame.event.get():
@@ -131,11 +153,30 @@ class Game:
             # update collision
             self.collision()
 
-            # check if ball has gone out of bounds on the left, if so, reset ball.
+            # check if ball has gone out of bounds on the left, if so, reset ball and add 1 to right score.
             if self.ball.x < 0:
-                self.ball.reset()
+                self.right_score += 1
+
+                # check if max score is reached, if so, reset game.
+                if self.right_score >= self.MAX_SCORE:
+                    self.display_winner("Player 2 is the winner!")
+
+                    
+
+                # else reset ball.    
+                else:   
+                    self.ball.reset()
+            
+            # same logic as before, reversed. (right side use width.)
             elif self.ball.x > self.WIDTH:
-                self.ball.reset()
+                self.left_score += 1
+
+                if self.left_score >= self.MAX_SCORE:
+                    self.display_winner("Player 1 is the winner!")
+                    
+
+                else: 
+                    self.ball.reset()
 
             # draw the game objects.
             self.draw_objects()
@@ -145,5 +186,24 @@ class Game:
 
             # set fps to 60
             pygame.time.Clock().tick(self.FPS)
+
+
+
+    def display_winner(self, winner):
+        # set winner text according to the argument passed.
+        winner_text = self.font.render(f'{winner}', 1, self.WHITE)
+        self.win.fill(self.RED)
+
+        #positioning of the winner text.
+        self.win.blit(winner_text, (self.WIDTH * 0.5 - winner_text.get_width() * 0.5, self.HEIGHT * 0.5 - winner_text.get_height() * 0.5))
+        pygame.display.update()
+
+        #quit game after 5 seconds.
+        pygame.time.delay(5000)
+        pygame.quit()
+
+        
+    
+
             
         
