@@ -21,6 +21,17 @@ class Ball:
         self.x += self.x_velocity
         self.y += self.y_velocity
 
+    def reset(self):
+        # resets the ball position and changes the velocity.
+        self.x = self.original_x
+        self.y = self.original_y
+        self.y_velocity = 0
+        self.x_velocity *= -1
+
+    
+
+    
+
 
 
 

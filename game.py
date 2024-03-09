@@ -54,7 +54,7 @@ class Game:
                  if self.ball.x - self.ball.radius <= self.left_paddle.x + self.left_paddle.width:
                     self.ball.x_velocity *= -1
 
-    # Check if the ball is moving right. If true, check for collision with the right paddle.
+        # Check if the ball is moving right. If true, check for collision with the right paddle.
         else:
             if self.ball.y >= self.right_paddle.y and self.ball.y <= self.right_paddle.y + self.right_paddle.height:
                 if self.ball.x + self.ball.radius >= self.right_paddle.x:
@@ -94,6 +94,12 @@ class Game:
 
             # update collision
             self.collision()
+
+            # check if ball has gone out of bounds on the left, if so, reset ball.
+            if self.ball.x < 0:
+                self.ball.reset()
+            elif self.ball.x > self.WIDTH:
+                self.ball.reset()
 
             # draw the game objects.
             self.draw_objects()
