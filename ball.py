@@ -1,7 +1,7 @@
 import pygame
 
 class Ball:
-    MAX_VELOCITY = 4
+    MAX_VELOCITY = 5
     WHITE = (255, 255, 255)
 
     def __init__(self, x, y, radius):

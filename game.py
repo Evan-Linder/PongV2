@@ -9,6 +9,7 @@ class Game:
     RED = (255, 0, 0)
     PADDLE_WIDTH, PADDLE_HEIGHT = 10, 100
     BALL_RADIUS = 7
+    FPS = 60
 
     # initalize the game.
     def __init__(self):
@@ -39,6 +40,28 @@ class Game:
 
         # update the display.
         pygame.display.update()
+
+    def collision(self):
+        # Check if the ball has gone out of bounds. If true, reverse the velocity.
+        if self.ball.y + self.ball.radius >= self.HEIGHT:
+            self.ball.y_velocity *= -1
+        elif self.ball.y - self.ball.radius <= 0:
+            self.ball.y_velocity *= -1
+
+         # Check if the ball is moving left. If true, check for collision with the left paddle.
+        if self.ball.x_velocity < 0:
+            if self.ball.y >= self.left_paddle.y and self.ball.y <= self.left_paddle.y + self.left_paddle.height:
+                 if self.ball.x - self.ball.radius <= self.left_paddle.x + self.left_paddle.width:
+                    self.ball.x_velocity *= -1
+
+    # Check if the ball is moving right. If true, check for collision with the right paddle.
+        else:
+            if self.ball.y >= self.right_paddle.y and self.ball.y <= self.right_paddle.y + self.right_paddle.height:
+                if self.ball.x + self.ball.radius >= self.right_paddle.x:
+                    self.ball.x_velocity *= -1
+
+        
+        
     
     def paddle_movement(self, keys):
         # checks left paddle for key presses. (W and S)
@@ -69,9 +92,15 @@ class Game:
             # update the balls position.
             self.ball.move()
 
+            # update collision
+            self.collision()
+
             # draw the game objects.
             self.draw_objects()
 
             #update the display. 
             pygame.display.update()
+
+            # set fps to 60 to avoid lagging and screen tearing.
+            pygame.time.Clock().tick(self.FPS)
         
