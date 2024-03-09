@@ -41,6 +41,7 @@ class Game:
         # set background to red.
         self.win.fill(self.RED)
 
+
         # draw the paddles in this list. 
         for paddle in (self.left_paddle , self.right_paddle):
             paddle.draw_objects(self.win)
@@ -102,13 +103,13 @@ class Game:
         
 
     def paddle_movement(self, keys):
-        # checks left paddle for key presses. (W and S)
+        # checks left paddle for key presses (W and S).
         if keys[pygame.K_w] and self.left_paddle.y - self.left_paddle.VELOCITY >= 0:
             self.left_paddle.move(up=True)
         if keys[pygame.K_s] and self.left_paddle.y + self.left_paddle.VELOCITY + self.left_paddle.height <= self.HEIGHT:
             self.left_paddle.move(up=False)
 
-        # checks right paddle for key presses. (Up and down arrows)
+        # checks right paddle for key presses (Up and down arrows).
         if keys[pygame.K_UP] and self.right_paddle.y - self.right_paddle.VELOCITY >= 0:
             self.right_paddle.move(up=True)
         if keys[pygame.K_DOWN] and self.right_paddle.y + self.right_paddle.VELOCITY + self.right_paddle.height <= self.HEIGHT:
@@ -214,7 +215,7 @@ class Game:
             self.win.blit(timer_text, (text_x, text_y))
             pygame.display.update()
 
-            # create a 1 second pause betweeen each itteration of the loop.
+            # create a 1 second pause betweeen each itteration of the loop
             pygame.time.delay(1000) 
 
         # Reset window and run game again.

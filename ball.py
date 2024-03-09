@@ -1,4 +1,4 @@
-import pygame
+import pygame, random
 
 class Ball:
     MAX_VELOCITY = 5
@@ -9,14 +9,16 @@ class Ball:
         self.x = self.original_x = x
         self.y = self.original_y = y
         self.radius = radius
-        self.x_velocity = self.MAX_VELOCITY
-        self.y_velocity = 0
+
+        # randomly choses x and y velocity.
+        self.y_velocity = random.choice([-self.MAX_VELOCITY, self.MAX_VELOCITY])  
+        self.x_velocity = random.choice([-self.MAX_VELOCITY, self.MAX_VELOCITY])  
 
      # Draw the ball on the window, make x and y unmutable and use circle instead of rect. 
     def draw_objects(self, win):
         pygame.draw.circle(win, self.WHITE, (self.x, self.y), self.radius) 
     
-    # move the ball
+    # move the ball.
     def move(self):
         self.x += self.x_velocity
         self.y += self.y_velocity
@@ -25,8 +27,12 @@ class Ball:
     def reset_ball(self):
         self.x = self.original_x
         self.y = self.original_y
-        self.y_velocity = 0
+        self.y_velocity *= -1
         self.x_velocity *= -1
+
+        # randomly choses x and y velocity
+        self.y_velocity = random.choice([-self.MAX_VELOCITY, self.MAX_VELOCITY])  
+        self.x_velocity = random.choice([-self.MAX_VELOCITY, self.MAX_VELOCITY])  
 
     
 
