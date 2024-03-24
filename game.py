@@ -2,41 +2,96 @@ import pygame
 from paddle import Paddle
 from ball import Ball
 
+import os
+
 class Game:
-    # create game constants (unmutable).
+    # create game constants (immutable).
     WIDTH, HEIGHT = 700, 500
     WHITE = (255, 255, 255)
     RED = (255, 0, 0)
     PADDLE_WIDTH, PADDLE_HEIGHT = 10, 100
     BALL_RADIUS = 7
     FPS = 60
-    MAX_SCORE = 1
+    MAX_SCORE = 5
 
-    # initalize the game.
+    # initialize the game.
     def __init__(self):
         pygame.init()
 
-        # put width and height in a tuple to avoid errors and make it unmutable. 
+        # put width and height in a tuple to avoid errors and make it immutable. 
         self.win = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
         pygame.display.set_caption("Pong game")
         self.font = pygame.font.SysFont(None, 36)
 
         # fps controller
         self.clock = pygame.time.Clock()
+        
+        # prompt the user to load a saved game or start a new one
+        self.load_saved_game = self.prompt_load_game()
+        
+        #if there is a saved game
+        if self.load_saved_game and os.path.exists("game_state.txt"):
+            self.load_game("game_state.txt")
+        else:
+            # Create the left paddle by providing its initial position (10 pixels from the left edge, centered vertically)
+            self.left_paddle = Paddle(10, self.HEIGHT * 0.5 - self.PADDLE_HEIGHT * 0.5, self.PADDLE_WIDTH, self.PADDLE_HEIGHT)
 
-        # Create the left paddle by providing its initial position (10 pixels from the left edge, centered vertically)
-        self.left_paddle = Paddle(10, self.HEIGHT * 0.5 - self.PADDLE_HEIGHT * 0.5, self.PADDLE_WIDTH, self.PADDLE_HEIGHT)
+            # Create the right paddle by providing its initial position (10 pixels from the left edge, centered vertically)
+            self.right_paddle = Paddle(self.WIDTH - 10 - self.PADDLE_WIDTH, self.HEIGHT // 2 - self.PADDLE_HEIGHT//2, self.PADDLE_WIDTH, self.PADDLE_HEIGHT)
 
-        # Create the right paddle by providing its initial position (10 pixels from the left edge, centered vertically)
-        self.right_paddle = Paddle(self.WIDTH - 10 - self.PADDLE_WIDTH, self.HEIGHT // 2 - self.PADDLE_HEIGHT//2, self.PADDLE_WIDTH, self.PADDLE_HEIGHT)
+            # Create the ball and center it horizontally and vertically.
+            self.ball = Ball(self.WIDTH * 0.5, self. HEIGHT * 0.5, self.BALL_RADIUS)
 
-        # Create the ball and center it horizontally and vertically.
-        self.ball = Ball(self.WIDTH * 0.5, self. HEIGHT * 0.5, self.BALL_RADIUS)
+            # set scores to 0
+            self.left_score = 0
+            self.right_score = 0
 
-        # set scores to 0
-        self.left_score = 0
-        self.right_score = 0
+    def prompt_load_game(self):
+        # Check if saved game file exists
+        if not os.path.exists("game_state.txt"):
+            return False
+        
+        # Ask if user wants to load saved game.
+        text = self.font.render("Do you want to load your previous game? (Y/N)", True, self.WHITE)
+        self.win.fill(self.RED)
+        self.win.blit(text, (self.WIDTH//2 - text.get_width() // 2, self.HEIGHT//2 - text.get_height() // 2))
+        pygame.display.update()
+        
+        # Check for y (yes) or n (no)
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_y:
+                        return True
+                    elif event.key == pygame.K_n:
+                        return False
 
+
+    
+    # save the current game state to a dictionary for later use.
+    def save_game(self, filename):
+        game_state = {
+            "left_score": self.left_score,
+            "right_score": self.right_score,
+            "left_paddle": self.left_paddle,
+            "right_paddle": self.right_paddle,
+            "ball": self.ball
+        }
+		# save the game state to the specified file.
+        save_game_state(game_state, filename)
+	
+	# load the current saved game.
+    def load_game(self, filename):
+		
+		#set game state to the current saved game
+        game_state = load_game_state(filename)
+        if game_state:
+            self.left_score = game_state["left_score"]
+            self.right_score = game_state["right_score"]
+            self.left_paddle = game_state["left_paddle"]
+            self.right_paddle = game_state["right_paddle"]
+            self.ball = game_state["ball"]
+    
     def draw_objects(self):
         # set background to red.
         self.win.fill(self.RED)
@@ -144,6 +199,7 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
+                    self.save_game("game_state.txt")
 
             #wait for user input.
             keys = pygame.key.get_pressed()
@@ -191,31 +247,41 @@ class Game:
             # set fps to 60
             pygame.time.Clock().tick(self.FPS)
 
-
     def display_winner(self, winner):
         # set winner text according to the argument passed.
         winner_text = self.font.render(f'{winner}', 1, self.WHITE)
+
+        # positioning of the winner text.
+        winner_text_rect = winner_text.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2))
+
+        # Fill the window with the red color.
         self.win.fill(self.RED)
 
-        #positioning of the winner text.
-        self.win.blit(winner_text, (self.WIDTH * 0.5 - winner_text.get_width() * 0.5, self.HEIGHT * 0.5 - winner_text.get_height() * 0.5))
-        pygame.display.update()
+        # Blit the winner text onto the window.
+        self.win.blit(winner_text, winner_text_rect)
 
         # display countdown till next game starts (5 seconds)
         for i in range(5, 0, -1):
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    return
+
             timer_text = self.font.render(f'Restarting in {i} seconds', 1, self.WHITE)
-            text_width, text_height = timer_text.get_size()
-            text_x = self.WIDTH * 0.5 - text_width * 0.5
-            text_y = self.HEIGHT * 0.75 - text_height * 0.5
+            text_rect = timer_text.get_rect(center=(self.WIDTH // 2, self.HEIGHT * 0.75))
         
-        # Clear the area where the timer text is drawn
-            pygame.draw.rect(self.win, self.RED, (text_x, text_y, text_width, text_height))
+            # Clear the area where the timer text is drawn
+            pygame.draw.rect(self.win, self.RED, text_rect)
         
-        # Draw the timer text
-            self.win.blit(timer_text, (text_x, text_y))
+            # Draw the timer text
+            self.win.blit(timer_text, text_rect)
             pygame.display.update()
 
-            # create a 1 second pause betweeen each itteration of the loop
+            # delete saved game file if it exists
+            if os.path.exists("game_state.txt"):
+                os.remove("game_state.txt")
+
+            # create a 1 second pause between each iteration of the loop
             pygame.time.delay(1000) 
 
         # Reset window and run game again.
@@ -227,7 +293,6 @@ class Game:
         self.run_game()
 
 
-        
     
 
             

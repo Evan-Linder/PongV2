@@ -27,6 +27,7 @@ class Ball:
     def reset_ball(self):
         self.x = self.original_x
         self.y = self.original_y
+
         self.y_velocity *= -1
         self.x_velocity *= -1
 
@@ -34,7 +35,6 @@ class Ball:
         self.y_velocity = random.choice([-self.MAX_VELOCITY, self.MAX_VELOCITY])  
         self.x_velocity = random.choice([-self.MAX_VELOCITY, self.MAX_VELOCITY])  
 
-    
 
     
 
